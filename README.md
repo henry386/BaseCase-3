@@ -16,3 +16,9 @@ This application makes it simple to download all files of a certain type in an a
 5. Once the program has got all the file locations, it will then ask for a location to download them to, it will automaticaly create subfolders within the parent directory to help organise the files
 6. This is the most time consuming part of the program as the application has to download each file
 7. Once the program has done, it will close and all the files you want should now be on your computer
+
+## Processing Stages:
+1. Program gets all the sub sites on the main repository
+2. Each sub site is scanned to get a list of files that need to be downloaded
+3. The size of each file on each sub site is queeried and added up to get a total size that can help the user determine whether they have enough storage to go ahead and estimate roughly how long the download will take
+4. The relevant files are downloaded
