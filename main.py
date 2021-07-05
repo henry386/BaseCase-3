@@ -84,43 +84,35 @@ def scrape_file():
 
 
 def get_download_size():
-    if skip_sizing == "N":
-        size_table = PrettyTable(["File Location" + Fore.RED, "File Size" + Fore.BLUE])
+    size_table = PrettyTable(["File Location" + Fore.RED, "File Size" + Fore.BLUE])
 
-        print("")
-        print(Fore.RED + "Getting File Files Size...")
-        print("")
-        pdf_files.pop("URL")
-        size = 0
-        for x in pdf_files:
-            try:
-                file_size_temp = requests.get(x, stream=True).headers['Content-length']
-                print(Fore.RED + "URL: " + Fore.CYAN + x + Fore.RED + " Size: " + Fore.LIGHTRED_EX +
-                      file_size_temp + " Bytes")
-                size = size + int(file_size_temp)
-                size_table.add_row([x + Fore.RED, str(round(int(file_size_temp) / 1048576, 3)) + " MB" + Fore.LIGHTRED_EX])
-            except():
-                print("ERROR")
+    print("")
+    print(Fore.RED + "Getting File Files Size...")
+    print("")
+    pdf_files.pop("URL")
+    size = 0
+    for x in pdf_files:
+        try:
+            file_size_temp = requests.get(x, stream=True).headers['Content-length']
+            print(Fore.RED + "URL: " + Fore.CYAN + x + Fore.RED + " Size: " + Fore.LIGHTRED_EX +
+                  file_size_temp + " Bytes")
+            size = size + int(file_size_temp)
+            size_table.add_row([x + Fore.RED, str(round(int(file_size_temp) / 1048576, 3)) + " MB" +
+                                Fore.LIGHTRED_EX])
+        except():
+            print("ERROR")
 
-        print("")
-        print(Fore.LIGHTGREEN_EX + "*" * 200)
-        print(size_table)
-        size = size / 1048576
-        print("")
-        print("")
-        print("Total Size: ~" + str(round(size)) + " MB")
-        print("")
-        print("")
-        print("*" * 200)
-        print("")
-    else:
-        print("")
-        print("")
-        print("Skipping Sizing...")
-        print("")
-        print("")
-        print("*" * 200)
-        print("")
+    print("")
+    print(Fore.LIGHTGREEN_EX + "*" * 200)
+    print(size_table)
+    size = size / 1048576
+    print("")
+    print("")
+    print("Total Size: ~" + str(round(size)) + " MB")
+    print("")
+    print("")
+    print("*" * 200)
+    print("")
 
 
 def download_files(location):
@@ -163,7 +155,6 @@ pdf_files = {"URL": "Directory"}
 urls = []
 url_main = "https://archive.org/details/" + input(Fore.LIGHTGREEN_EX + "Enter Repository: ")
 file_type = input(Fore.LIGHTGREEN_EX + "Enter File Type: ")
-skip_sizing = input("Skip File Sizing? (Y/N)")
 scrape(url_main)
 scrape_file()
 get_download_size()
