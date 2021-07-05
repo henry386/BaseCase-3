@@ -1,0 +1,8 @@
+Requirements:
+Operator
+os
+requests
+bs4
+pyfiglet
+prettytable
+colorama
