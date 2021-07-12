@@ -1,4 +1,3 @@
-import operator
 import os
 from os import path
 import requests
@@ -7,7 +6,8 @@ import pyfiglet
 from prettytable import PrettyTable
 from os import system, name
 from colorama import Fore, Back, Style
-from tabulate import tabulate
+import eyed3
+import re
 
 
 def clear():
@@ -83,6 +83,32 @@ def scrape_file():
     print(Fore.LIGHTGREEN_EX + "*" * 200)
 
 
+def scrape_file_single_page(page):
+    print("")
+    print(Fore.RED + "Getting " + file_type + " URLS...")
+
+    reqs = requests.get(page)
+    soup = BeautifulSoup(reqs.text, 'html.parser')
+    i = 0
+    links = soup.find_all('a')
+
+    for link in links:
+        if str(link.get('href', [])).endswith('.' + file_type):
+            i += 1
+            print("")
+            splitting = ("https://archive.org" + link.get('href')).split('/')
+            print(Fore.RED + "NAME: " + Fore.CYAN + splitting[4])
+
+            print(Fore.RED + "LOCATION: " + Fore.CYAN + "https://archive.org" + link.get('href'))
+            pdf_files.update({"https://archive.org" + link.get('href'): splitting[4]})
+
+    print("")
+    print("")
+    print(str(len(pdf_files)) + " Files")
+    print("")
+    print(Fore.LIGHTGREEN_EX + "*" * 200)
+
+
 def get_download_size():
     size_table = PrettyTable(["File Location" + Fore.RED, "File Size" + Fore.BLUE])
 
@@ -129,17 +155,22 @@ def download_files(location):
             if not os.path.isdir(download_location):
                 os.mkdir(download_location)
             i = 0
-            if not path.exists(download_location + pdf_files[x] + "." + file_type):
-                with open(download_location + pdf_files[x] + "." + file_type, 'wb') as f:
-                    f.write(r.content)
-            else:
-                exists = False
-                while not exists:
-                    if not path.exists(download_location + pdf_files[x] + "_" + str(i) + ".pdf"):
-                        exists = True
-                        with open(download_location + pdf_files[x] + "_" + str(i) + ".pdf", 'wb') as f:
+
+            exists = False
+            while not exists:
+                if not path.exists(download_location + pdf_files[x] + "_" + str(i) + file_type):
+                    exists = True
+                    with open(download_location + pdf_files[x] + "_" + str(i) + file_type, 'wb') as f:
+                        f.write(r.content)
+
+                    if file_type == "mp3":
+                        audio = eyed3.load(download_location + pdf_files[x] + "_" + str(i) + file_type)
+                        tag = re.sub(r"[^a-zA-Z0-9]", "", str(audio.tag.title).strip())
+
+                        with open(download_location + tag + "." + file_type, 'wb') as f:
                             f.write(r.content)
-                    i = i + 1
+                        os.remove(download_location + pdf_files[x] + "_" + str(i) + file_type)
+                i = i + 1
 
         except():
             print("Error: " + x)
@@ -153,10 +184,15 @@ print(Fore.RED + "-Archive.org Repository Scraper (Author: henry386)-")
 print("")
 pdf_files = {"URL": "Directory"}
 urls = []
+single_page = input(Fore.LIGHTGREEN_EX + "Single Page Mode (Y/N): ")
 url_main = "https://archive.org/details/" + input(Fore.LIGHTGREEN_EX + "Enter Repository: ")
 file_type = input(Fore.LIGHTGREEN_EX + "Enter File Type: ")
-scrape(url_main)
-scrape_file()
+
+if single_page == "Y":
+    scrape_file_single_page(url_main)
+else:
+    scrape(url_main)
+    scrape_file()
 get_download_size()
 
 download_files(input("Enter Download Location: "))
